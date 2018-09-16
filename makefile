@@ -1,9 +1,9 @@
 CC=g++
 CFLAGS=-c -Wall
-LDFLAGS=
+LDFLAGS=-pthread
 SOURCES=main.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
-EXECUTABLE=c3316165A1
+EXECUTABLE=exe
 
 all: $(SOURCES) $(EXECUTABLE)
 
