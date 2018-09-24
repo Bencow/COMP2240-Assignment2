@@ -60,21 +60,25 @@ void sharingTheBridge()
 
 }
 
-struct Arg
+//Struct containing all the arguments passed to the threads
+struct thread_data
 {
+  //identifer of the thread
   int id;
+  //idkyet
   int count;
 };
 
 
-void *routineTest(void* arg)
+void *routineTest(void* thread_arg)
 {
-  Arg data = arg;
+  //casting the void* pointer to a thread_data*
+  thread_data* data = (thread_data*)thread_arg;
 
   while(true)
   {
-    std::cout << data.id;
-    data.count++;
+    // std::cout << data->id << " ";
+    data->count++;
   }
   pthread_exit(NULL);
 }
@@ -82,37 +86,40 @@ void *routineTest(void* arg)
 
 int main(int argc, char const *argv[])
 {
-  //sharingTheBridge();
-
-  //Creation of an array of threads
-
-  Arg data[N_THREADS];
+  //Creation of an array of pointers to the data of a thread
+  thread_data* data[N_THREADS];
   for(int i = 0 ; i < N_THREADS ; ++i)
   {
-    data[i].id = i;
-    data[i].count = 0;
+    //Initialize the data of each thread
+    data[i] = new thread_data;
+    data[i]->id = i;
+    data[i]->count = 0;
   }
 
   pthread_t threads[N_THREADS];
-  long rc;
+  long error;
 
-  //pthread_create(pthread_t* thread, void* attribute, void* start_routine, arg)
+  //pthread_create(pthread_t* thread, void* attribute, void* start_routine, thread_data)
   //Note : start_routine is a functer
-  //Note : arg is the argument passed to the start_routine function
-
-  long i;
-
-  for( i = 0 ; i < N_THREADS ; i++)
+  //Note : thread_data is the argument passed to the start_routine function
+  for(int i = 0 ; i < N_THREADS ; i++)
   {
-    rc = pthread_create(&threads[i], NULL, routineTest, (void *)data[i]);
-    //test if there's a prooblem during the creation of the thread
-    if(rc)
-    {
-      std::cout << "ERROR, return code from thread " << i << " is " << rc <<'\n';
+    //Exucuting each thread (and returning error code if something wrong happened)
+    error = pthread_create(&threads[i], NULL, routineTest, (void *) data[i]);
+
+    //test if there's a problem during the creation of the thread
+    if(error){
+      std::cout << "ERROR, return code from thread " << i << " is " << error <<'\n';
       exit(-1);
     }
   }
+  int wait;
+  std::cin >> wait;
+  for (int i = 0; i < N_THREADS; i++) {
+    std::cout << i << " " << data[i]->count << '\n';
 
+  }
+  
   pthread_exit(NULL);
   return 0;
 }
